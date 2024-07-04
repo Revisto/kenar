@@ -1,0 +1,22 @@
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: #cae0d3;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+svg.no-cursor, svg.no-cursor .item {
+  cursor: none !important;
+}
+
+#smile,
+.item {
+  visibility: hidden;
+}

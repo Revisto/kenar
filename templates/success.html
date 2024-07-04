@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - CSS Only Shimmer Button</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel='stylesheet' href='https://codepen.io/simeydotme/pen/WNawZXp/be618208e9e17abe52c0fc63379e5f88.css'>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/success.css') }}">
+</head>
+<body>
+<main id="app" style="display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column;">
+    <h1>Upload Successful!</h1>
+    <button>
+        <a href="{{ view_url }}" class="button-link">
+            <span class="text">View The Awesome Model</span>
+            <span class="shimmer"></span>
+        </a>
+    </button>
+</main>
+</body>
+</html>

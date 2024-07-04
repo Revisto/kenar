@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #fff;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(8.5px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            text-align: center;
+        }
+        input[type="file"],
+        input[type="text"],
+        button {
+            display: block;
+            width: 80%;
+            padding: 10px;
+            margin: 20px auto;
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        input[type="text"] {
+            background-color: #fff;
+            color: #333;
+        }
+        button {
+            background-color: #ff477e;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+        }
+        button:hover {
+            background-color: #ff6392;
+        }
+        label {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Image</h1>
+        <form id="uploadForm" method="POST" enctype="multipart/form-data">
+            <div>
+                <label for="file">Upload from file:</label>
+                <input type="file" id="file" name="file" onchange="checkInputType()">
+            </div>
+            <div>
+                <label for="url">Or by URL:</label>
+                <input type="text" id="url" name="url" placeholder="Enter image URL" oninput="checkInputType()">
+            </div>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+    <script>
+        function checkInputType() {
+            const form = document.getElementById('uploadForm');
+            const fileInput = document.getElementById('file').value;
+            const urlInput = document.getElementById('url').value;
+            // Assuming the base URL is correctly set to include /<post-id>/upload
+            // Adjust the form action based on input type
+            if (fileInput) {
+                form.action = window.location.pathname;
+            } else if (urlInput) {
+                form.action = window.location.pathname;
+            }
+        }
+    </script>
+</body>
+</html>
