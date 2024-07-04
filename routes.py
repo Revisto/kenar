@@ -14,7 +14,7 @@ main = Blueprint('main', __name__)
 def view(post_id):
     post = post_operations.get_post_by_id(post_id)
     if post:
-        if post.model_status == 'COMPLETED':
+        if post.model_status == 'SUCCEEDED':
             pass
         elif post.model_status == 'FAILED':
             flash('Model creation failed')
