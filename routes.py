@@ -93,12 +93,14 @@ def upload_post(post_id):
         flash('No file or URL provided')
         return redirect(request.url)
     
-# handle upload/?post_token=gZFmMQKr and redicrext to /<post_id>/upload
 @main.route('/upload', methods=['GET'])
 def upload_redirect():
     post_id = request.args.get('post_token')
     return redirect(url_for('main.upload', post_id=post_id))
 
 @main.route('/')
-def test_success_page():
-    return render_template('wait3.html')
+def redirect_to_view():
+    action = request.args.get('action')
+    if action == 'view':
+        post_id = request.args.get('post_token')
+        return redirect(url_for('main.view', post_id=post_id))
