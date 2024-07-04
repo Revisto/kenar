@@ -42,7 +42,7 @@ def view(post_id):
                 return render_template('error.html', error='Unknown status')
     else:
         flash('Post not found')
-        return render_template('error.html', error='Post not found')
+        return render_template('404.html', error='Post not found')
     
     model_file = url_for('static', filename=f"{post_id}.glb")
     return render_template('view.html', model_file=model_file)
