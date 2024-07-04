@@ -101,4 +101,4 @@ def upload_redirect():
 
 @main.route('/')
 def test_success_page():
-    return render_template('wait2.html')
+    return render_template('wait3.html')

@@ -1,156 +1,134 @@
-// Vars
+var $body = document.body,
+		$wrap = document.getElementById('wrap'),
 
-function Room(fill, viewBox, items) {
-	this.value = 0;
-	this.items = items || 4;
-	this.fill = fill;
-	this.viewBox = viewBox;
-}
+		areawidth = window.innerWidth,
+		areaheight = window.innerHeight,
 
-var rooms = {
-	dressingroom: new Room('#cd5c5c', '30 202 150 100', 3),
-	livingroom: new Room('#66cdaa', '153 198 165 105'),
-	kitchen: new Room('#f0e68c', '305 202 150 100'),
-	bedroom: new Room('#ffe4c4', '103 104 155 98'),
-	bathroom: new Room('#ffffe0', '259 104 165 100', 3),
-	cabinet: new Room('#d8Bfd8', '105 -20 255 150', 3),
-	totalItems: 0
-}
+		canvassize = 500,
 
-var tlThrowItems = new TimelineMax();
-var tlEnd = new TimelineMax({paused: true});
+		length = 30,
+		radius = 5.6,
 
-// Set
+		rotatevalue = 0.035,
+		acceleration = 0,
+		animatestep = 0,
+		toend = false,
 
-TweenMax.set(['.item', '.place', '#ground', '#smile'], {
-	transformOrigin: 'center'
-})
-TweenMax.set('.item', {
-	autoAlpha: 1
-})
+		pi2 = Math.PI*2,
 
-// Timelines
+		group = new THREE.Group(),
+		mesh, ringcover, ring,
 
-tlThrowItems
-	.staggerFrom('.item', .35, {
-		y: 300,
-		ease: Elastic.easeOut.config(.3)
-	}, .1);
+		camera, scene, renderer;
 
-tlEnd
-	.to('#ground', .55, {
-		morphSVG: '#smile',
-		delay: 1.05
-	});
 
-// Draggable
+	camera = new THREE.PerspectiveCamera(65, 1, 1, 10000);
+	camera.position.z = 150;
 
-var s = 4;
+	scene = new THREE.Scene();
+	// scene.add(new THREE.AxisHelper(30));
+	scene.add(group);
 
-Draggable.create('.item', {
-	bounds: window,
-	throwProps: true,
-	snap: {
-		x: function(endValue) {
-			return Math.round(endValue / s) * s;
-		},
-		y: function(endValue) {
-			return Math.round((endValue) / s) * s;
+	mesh = new THREE.Mesh(
+		new THREE.TubeGeometry(new (THREE.Curve.create(function() {},
+			function(percent) {
+
+				var x = length*Math.sin(pi2*percent),
+					y = radius*Math.cos(pi2*3*percent),
+					z, t;
+
+				t = percent%0.25/0.25;
+				t = percent%0.25-(2*(1-t)*t* -0.0185 +t*t*0.25);
+				if (Math.floor(percent/0.25) == 0 || Math.floor(percent/0.25) == 2) {
+					t *= -1;
+				}
+				z = radius*Math.sin(pi2*2* (percent-t));
+
+				return new THREE.Vector3(x, y, z);
+
+			}
+		))(), 200, 1.1, 2, true),
+		new THREE.MeshBasicMaterial({
+			color: 0xffffff
+			// , wireframe: true
+		})
+	);
+	group.add(mesh);
+
+	ringcover = new THREE.Mesh(new THREE.PlaneGeometry(50, 15, 1), new THREE.MeshBasicMaterial({color: 0xd1684e, opacity: 0, transparent: true}));
+	ringcover.position.x = length+1;
+	ringcover.rotation.y = Math.PI/2;
+	group.add(ringcover);
+
+	ring = new THREE.Mesh(new THREE.RingGeometry(4.3, 5.55, 32), new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 0, transparent: true}));
+	ring.position.x = length+1.1;
+	ring.rotation.y = Math.PI/2;
+	group.add(ring);
+
+	// fake shadow
+	(function() {
+		var plain, i;
+		for (i = 0; i < 10; i++) {
+			plain = new THREE.Mesh(new THREE.PlaneGeometry(length*2+1, radius*3, 1), new THREE.MeshBasicMaterial({color: 0xd1684e, transparent: true, opacity: 0.13}));
+			plain.position.z = -2.5+i*0.5;
+			group.add(plain);
 		}
-	},
-	onDrag: onDrag,
-	onDragEnd: onDragEnd
-});
+	})();
 
-function onDragEnd() {
-	cursorShow();
-	zoomOut();
-	
-	var hitTarget = this.target.getAttribute('data-item');
-	var room = this.target.getAttribute('data-room');
-	var dirty = +this.target.getAttribute('data-dirty');
+	renderer = new THREE.WebGLRenderer({
+		antialias: true
+	});
+	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.setSize(canvassize, canvassize);
+	renderer.setClearColor('#d1684e');
 
-	if (this.hitTest('#' + room, '70 %') && !dirty) {
-		rooms[room].value++;
-		rooms.totalItems++;
-		this.target.setAttribute('data-dirty', 1);
-	}	else if (!this.hitTest('#' + room, '70 %') && dirty) {
-		rooms[room].value--;
-		rooms.totalItems--;
-		this.target.setAttribute('data-dirty', 0);
+	$wrap.appendChild(renderer.domElement);
+
+	$body.addEventListener('mousedown', start, false);
+	$body.addEventListener('touchstart', start, false);
+	$body.addEventListener('mouseup', back, false);
+	$body.addEventListener('touchend', back, false);
+
+	animate();
+
+
+	function start() {
+		toend = true;
 	}
 	
-	if (rooms[room].value >= rooms[room].items) {
-		TweenMax.to('#' + room, .85, {
-			fill: rooms[room].fill,
-			ease: Back.easeOut
-		})
+	function back() {
+		toend = false;
 	}
-	
-	if (rooms.totalItems >= 21) {
-		tlEnd.play();
+
+	function tilt(percent) {
+		group.rotation.y = percent*0.5;
 	}
-}
 
-function onDrag() {
-	
-	var hitTarget = this.target.getAttribute('data-item');
-	var room = this.target.getAttribute('data-room');
+	function render() {
 
-	if (this.hitTest('#' + room, '85 %')) {
-		TweenMax.to('.item-' + hitTarget, .6, {
-			scale: 1.05,
-			ease: Bounce.easeOut
-		})
-		TweenMax.to('.place-' + hitTarget, .35, {
-			scale: 0
-		})
-	} else {
-		TweenMax.to('.item-' + hitTarget, .4, {
-			scale: 1,
-			ease: Bounce.easeOut
-		})
-		TweenMax.to('.place-' + hitTarget, .3, {
-			scale: 1
-		})
+		var progress;
+
+		animatestep = Math.max(0, Math.min(240, toend ? animatestep+1 : animatestep-4));
+		acceleration = easing(animatestep, 0, 1, 240);
+
+		if (acceleration > 0.35) {
+			progress = (acceleration-0.35)/0.65;
+			group.rotation.y = -Math.PI/2 *progress;
+			group.position.z = 50*progress;
+			progress = Math.max(0, (acceleration-0.97)/0.03);
+			mesh.material.opacity = 1-progress;
+			ringcover.material.opacity = ring.material.opacity = progress;
+			ring.scale.x = ring.scale.y = 0.9 + 0.1*progress;
+		}
+
+		renderer.render(scene, camera);
+
 	}
-	
-	if (this.hitTest('#' + room, '50%')) {
-		cursorHide();
-		zoomIn(rooms[room].viewBox);
-	} else {
-		cursorShow();
-		zoomOut();
+
+	function animate() {
+		mesh.rotation.x += rotatevalue + acceleration;
+		render();
+		requestAnimationFrame(animate);
 	}
-}
 
-// Helpers
-
-function cursorHide() {
-	TweenMax.set('svg', {
-		className: 'no-cursor',
-	})
-}
-function cursorShow() {
-	TweenMax.set('svg', {
-		className: ''
-	})
-}
-
-function zoomIn(viewBox) {
-	TweenMax.to('svg', .95, {
-		attr: {
-			viewBox: viewBox
-		},
-		ease: Power3.easeOut
-	})
-}
-
-function zoomOut() {
-	TweenMax.to('svg', 1.15, {
-		attr: {
-			viewBox: '0 0 500 500'
-		},
-		ease: Power3.easeOut
-	})
-}
+	function easing(t,b,c,d) {if((t/=d/2)<1)return c/2*t*t+b;return c/2*((t-=2)*t*t+2)+b;}

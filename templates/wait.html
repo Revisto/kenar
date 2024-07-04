@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-    <meta charset="UTF-8">
-    <title>Processing</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding-top: 50px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>CodePen - Her - OS1 Loading</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/wait.css') }}">
+
 </head>
 <body>
-    <h1>Your request is being processed</h1>
-    <p>Please wait, this may take a few minutes.</p>
-    <p>Progress: {{ progress }}%</p>
+<!-- partial:index.partial.html -->
+<div id="wrap">
+</div>
+  <div id="progress" style="top: 27%; font-size:12px;">Your request is being processed</div>
+  <div id="progress">Progress: {{ progress }}%</div>
+  <p class="info">* Mouse or Finger press on the page to finish loading action.</p>
+<!-- partial -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r77/three.min.js'></script><script src="{{ url_for('static', filename='js/wait.js') }}"></script>
 </body>
 </html>
