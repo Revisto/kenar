@@ -2,4 +2,3 @@ flask_sqlalchemy
 flask
 python-dotenv
 trimesh
-aspose-cad
