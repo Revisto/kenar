@@ -30,7 +30,6 @@ def view(post_id):
                 with open(model_file, 'wb') as file:
                     response = requests.get(model_file_url)
                     file.write(response.content)
-                #resize_model(model_file, model_file, post.new_sizes)
                 post_operations.update_post_status(post_id, 'SUCCEEDED')
             elif task['status'] == 'FAILED' or task['status'] == 'EXPIRED':
                 flash('Model creation failed')
@@ -85,10 +84,9 @@ def upload_post(post_id):
             file.save(os.path.join("./", filename))
             task_id = MeshyService(Config.MESHY_API_KEY).create_image_to_3d_task(ImageUploader(Config.IMAGE_UPLOAD_URL).upload_image_from_file(filename))
             os.remove(filename)
-            new_sizes = request.form.get('new_sizes')
             if post_operations.get_post_by_id(post_id):
                 post_operations.delete_post(post_id)
-            post_operations.create_new_post(post_id, task_id, new_sizes)
+            post_operations.create_new_post(post_id, task_id)
             flash('File successfully uploaded')
             view_url = url_for('main.view', post_id=post_id, admin=True)
             return render_template('success.html', view_url=view_url)

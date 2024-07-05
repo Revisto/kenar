@@ -1,7 +1,7 @@
 from db.models import db, Post
 
-def create_new_post(post_id, task_id, new_sizes={}):
-    new_post = Post(post_id=post_id, task_id=task_id, new_sizes=new_sizes)
+def create_new_post(post_id, task_id):
+    new_post = Post(post_id=post_id, task_id=task_id)
     db.session.add(new_post)
     db.session.commit()
 
