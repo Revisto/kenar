@@ -182,3 +182,27 @@ main#app {
     text-decoration: none;
     font-size: 18px; /* Adjust link size as needed */
   }
+  * {
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+  }
+  
+  body, html {
+    margin: 0; /* Removes default margin */
+    padding: 0; /* Removes default padding */
+    height: 100vh; /* Full viewport height */
+    display: flex; /* Ensures flex layout */
+    justify-content: center; /* Centers content horizontally */
+    align-items: center; /* Centers content vertically */
+    overflow: hidden; /* Prevents scrolling */
+  }
+  
+  main#app {
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    display: flex; /* Ensures flex layout */
+    flex-direction: column; /* Stacks children vertically */
+    justify-content: center; /* Centers content vertically */
+    align-items: center; /* Centers content horizontally */
+    padding: 20px; /* Adjusts padding as needed, consider reducing if causing overflow */
+    overflow: hidden; /* Prevents internal scrolling */
+  }
