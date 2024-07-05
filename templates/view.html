@@ -1,12 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html style="background-color: #eee;">
 <head>
     <title>Atashinzh</title>
 </head>
 <body>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+  <div class="model-viewer-container">
+    <model-viewer style="width: 100%; height: 100%;" id="dimension-demo" ar ar-scale="auto" camera-orbit="-30deg auto auto" max-camera-orbit="auto 100deg auto" shadow-intensity="1" ar camera-controls touch-action="pan-y" src="{{ model_file }}" tone-mapping="neutral" alt="A 3D model of an armchair.">
+    <button slot="ar-button" id="ar-button">
+      View in your space
+  </button>
+  <button id="ar-failure">
+    AR is not tracking!
+</button>
 
-  <model-viewer id="dimension-demo" ar ar-modes="webxr" ar-scale="fixed" camera-orbit="-30deg auto auto" max-camera-orbit="auto 100deg auto" shadow-intensity="1" ar camera-controls touch-action="pan-y" src="{{ model_file }}" tone-mapping="neutral" alt="A 3D model of an armchair.">
     <button slot="hotspot-dot+X-Y+Z" class="dot" data-position="1 -1 1" data-normal="1 0 0"></button>
     <button slot="hotspot-dim+X-Y" class="dim" data-position="1 -1 0" data-normal="1 0 0"></button>
     <button slot="hotspot-dot+X-Y-Z" class="dot" data-position="1 -1 -1" data-normal="1 0 0"></button>
@@ -27,143 +34,19 @@
     </svg>
   
     <div id="controls" class="dim">
-
       <label for="show-dimensions">Show Dimensions:</label>
       <input id="show-dimensions" type="checkbox" checked="true">
     </div>
-  </model-viewer>
-  
-  <script type="module">
-    const modelViewer = document.querySelector('#dimension-demo');
 
-  
-    const checkbox = modelViewer.querySelector('#show-dimensions');
-  
-    const dimElements = [...modelViewer.querySelectorAll('button'), modelViewer.querySelector('#dimLines')];
-  
-    function setVisibility(visible) {
-      dimElements.forEach((element) => {
-        if (visible) {
-          element.classList.remove('hide');
-        } else {
-          element.classList.add('hide');
-        }
-      });
-    }
-  
-    checkbox.addEventListener('change', () => {
-      setVisibility(checkbox.checked);
-    });
-  
-    modelViewer.addEventListener('ar-status', (event) => {
-      setVisibility(checkbox.checked && event.detail.status !== 'session-started');
-    });
-  
-    // update svg
-    function drawLine(svgLine, dotHotspot1, dotHotspot2, dimensionHotspot) {
-      if (dotHotspot1 && dotHotspot2) {
-        svgLine.setAttribute('x1', dotHotspot1.canvasPosition.x);
-        svgLine.setAttribute('y1', dotHotspot1.canvasPosition.y);
-        svgLine.setAttribute('x2', dotHotspot2.canvasPosition.x);
-        svgLine.setAttribute('y2', dotHotspot2.canvasPosition.y);
-  
-        // use provided optional hotspot to tie visibility of this svg line to
-        if (dimensionHotspot && !dimensionHotspot.facingCamera) {
-          svgLine.classList.add('hide');
-        }
-        else {
-          svgLine.classList.remove('hide');
-        }
-      }
-    }
-  
-    const dimLines = modelViewer.querySelectorAll('line');
-  
-    const renderSVG = () => {
-      drawLine(dimLines[0], modelViewer.queryHotspot('hotspot-dot+X-Y+Z'), modelViewer.queryHotspot('hotspot-dot+X-Y-Z'), modelViewer.queryHotspot('hotspot-dim+X-Y'));
-      drawLine(dimLines[1], modelViewer.queryHotspot('hotspot-dot+X-Y-Z'), modelViewer.queryHotspot('hotspot-dot+X+Y-Z'), modelViewer.queryHotspot('hotspot-dim+X-Z'));
-      drawLine(dimLines[2], modelViewer.queryHotspot('hotspot-dot+X+Y-Z'), modelViewer.queryHotspot('hotspot-dot-X+Y-Z')); // always visible
-      drawLine(dimLines[3], modelViewer.queryHotspot('hotspot-dot-X+Y-Z'), modelViewer.queryHotspot('hotspot-dot-X-Y-Z'), modelViewer.queryHotspot('hotspot-dim-X-Z'));
-      drawLine(dimLines[4], modelViewer.queryHotspot('hotspot-dot-X-Y-Z'), modelViewer.queryHotspot('hotspot-dot-X-Y+Z'), modelViewer.queryHotspot('hotspot-dim-X-Y'));
-    };
-  
-    modelViewer.addEventListener('load', () => {
-      const center = modelViewer.getBoundingBoxCenter();
-      const size = modelViewer.getDimensions();
-      const x2 = size.x / 2;
-      const y2 = size.y / 2;
-      const z2 = size.z / 2;
-  
-      modelViewer.updateHotspot({
-        name: 'hotspot-dot+X-Y+Z',
-        position: `${center.x + x2} ${center.y - y2} ${center.z + z2}`
-      });
-  
-      modelViewer.updateHotspot({
-        name: 'hotspot-dim+X-Y',
-        position: `${center.x + x2 * 1.2} ${center.y - y2 * 1.1} ${center.z}`
-      });
-      modelViewer.querySelector('button[slot="hotspot-dim+X-Y"]').textContent =
-          `${(size.z * 100).toFixed(0)} cm`;
-  
-      modelViewer.updateHotspot({
-        name: 'hotspot-dot+X-Y-Z',
-        position: `${center.x + x2} ${center.y - y2} ${center.z - z2}`
-      });
-  
-      modelViewer.updateHotspot({
-        name: 'hotspot-dim+X-Z',
-        position: `${center.x + x2 * 1.2} ${center.y} ${center.z - z2 * 1.2}`
-      });
-      modelViewer.querySelector('button[slot="hotspot-dim+X-Z"]').textContent =
-          `${(size.y * 100).toFixed(0)} cm`;
-  
-      modelViewer.updateHotspot({
-        name: 'hotspot-dot+X+Y-Z',
-        position: `${center.x + x2} ${center.y + y2} ${center.z - z2}`
-      });
-  
-      modelViewer.updateHotspot({
-        name: 'hotspot-dim+Y-Z',
-        position: `${center.x} ${center.y + y2 * 1.1} ${center.z - z2 * 1.1}`
-      });
-      modelViewer.querySelector('button[slot="hotspot-dim+Y-Z"]').textContent =
-          `${(size.x * 100).toFixed(0)} cm`;
-  
-      modelViewer.updateHotspot({
-        name: 'hotspot-dot-X+Y-Z',
-        position: `${center.x - x2} ${center.y + y2} ${center.z - z2}`
-      });
-  
-      modelViewer.updateHotspot({
-        name: 'hotspot-dim-X-Z',
-        position: `${center.x - x2 * 1.2} ${center.y} ${center.z - z2 * 1.2}`
-      });
-      modelViewer.querySelector('button[slot="hotspot-dim-X-Z"]').textContent =
-          `${(size.y * 100).toFixed(0)} cm`;
-  
-      modelViewer.updateHotspot({
-        name: 'hotspot-dot-X-Y-Z',
-        position: `${center.x - x2} ${center.y - y2} ${center.z - z2}`
-      });
-  
-      modelViewer.updateHotspot({
-        name: 'hotspot-dim-X-Y',
-        position: `${center.x - x2 * 1.2} ${center.y - y2 * 1.1} ${center.z}`
-      });
-      modelViewer.querySelector('button[slot="hotspot-dim-X-Y"]').textContent =
-          `${(size.z * 100).toFixed(0)} cm`;
-  
-      modelViewer.updateHotspot({
-        name: 'hotspot-dot-X-Y+Z',
-        position: `${center.x - x2} ${center.y - y2} ${center.z + z2}`
-      });
-  
-      renderSVG();
-  
-      modelViewer.addEventListener('camera-change', renderSVG);
-    });
-  </script>
+  </model-viewer>
+  <!-- show this if user is admin, check parameter jinja flask -->
+  <div id="newDimensions" style="display: {{ 'contents' if user_is_admin else 'none' }}; flex-direction: column; gap: 10px; max-width: 200px; margin: auto; margin-bottom: 20px;">
+    <input type="number" id="newX" placeholder="New X in cm" style="margin-top: 20px; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+    <input type="number" id="newY" placeholder="New Y in cm" style="margin-top: 20px; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+    <input type="number" id="newZ" placeholder="New Z in cm" style="margin-top: 20px; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+    <button id="submitNewDimensions" style="padding: 10px; border-radius: 5px; border: none; background-color: #007bff; color: white; cursor: pointer;">Update Model Scale</button>
+  </div>
+</div>
   <style>
     #controls {
       position: absolute;
@@ -225,6 +108,365 @@
     :not(:defined) > * {
       display: none;
     }
+
+    #ar-button {
+      background-image: url(../../assets/ic_view_in_ar_new_googblue_48dp.png);
+      background-repeat: no-repeat;
+      background-size: 20px 20px;
+      background-position: 12px 50%;
+      background-color: #fff;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      bottom: 132px;
+      padding: 0px 16px 0px 40px;
+      font-family: Roboto Regular, Helvetica Neue, sans-serif;
+      font-size: 14px;
+      color:#4285f4;
+      height: 36px;
+      line-height: 36px;
+      border-radius: 18px;
+      border: 1px solid #DADCE0;
+    }
+  
+    #ar-button:active {
+      background-color: #E8EAED;
+    }
+  
+    #ar-button:focus {
+      outline: none;
+    }
+  
+    #ar-button:focus-visible {
+      outline: 1px solid #4285f4;
+    }
+    /* This keeps child nodes hidden while the element loads */
+    :not(:defined) > * {
+      display: none;
+    }
+  
+    model-viewer {
+        background-color: #eee;
+        overflow-x: hidden;
+    }
+  
+    #ar-button {
+      background-image: url(../../assets/ic_view_in_ar_new_googblue_48dp.png);
+      background-repeat: no-repeat;
+      background-size: 20px 20px;
+      background-position: 12px 50%;
+      background-color: #fff;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      bottom: 132px;
+      padding: 0px 16px 0px 40px;
+      font-family: Roboto Regular, Helvetica Neue, sans-serif;
+      font-size: 14px;
+      color:#4285f4;
+      height: 36px;
+      line-height: 36px;
+      border-radius: 18px;
+      border: 1px solid #DADCE0;
+    }
+  
+    #ar-button:active {
+      background-color: #E8EAED;
+    }
+  
+    #ar-button:focus {
+      outline: none;
+    }
+  
+    #ar-button:focus-visible {
+      outline: 1px solid #4285f4;
+    }
+  
+    @keyframes circle {
+      from { transform: translateX(-50%) rotate(0deg) translateX(50px) rotate(0deg); }
+      to   { transform: translateX(-50%) rotate(360deg) translateX(50px) rotate(-360deg); }
+    }
+  
+    @keyframes elongate {
+      from { transform: translateX(100px); }
+      to   { transform: translateX(-100px); }
+    }
+  
+    model-viewer > #ar-prompt {
+      position: absolute;
+      left: 50%;
+      bottom: 175px;
+      animation: elongate 2s infinite ease-in-out alternate;
+      display: none;
+    }
+  
+    model-viewer[ar-status="session-started"] > #ar-prompt {
+      display: block;
+    }
+  
+    model-viewer > #ar-prompt > img {
+      animation: circle 4s linear infinite;
+    }
+  
+    model-viewer > #ar-failure {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 175px;
+      display: none;
+    }
+  
+    model-viewer[ar-tracking="not-tracking"] > #ar-failure {
+      display: block;
+    }
+  
+    .slider {
+      width: 100%;
+      text-align: center;
+      overflow: hidden;
+      position: absolute;
+      bottom: 16px;
+    }
+  
+    .slides {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+  
+    .slide {
+      scroll-snap-align: start;
+      flex-shrink: 0;
+      width: 100px;
+      height: 100px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-color: #fff;
+      margin-right: 10px;
+      border-radius: 10px;
+      border: none;
+      display: flex;
+    }
+  
+    .slide.selected {
+      border: 2px solid #4285f4;
+    }
+  
+    .slide:focus {
+      outline: none;
+    }
+  
+    .slide:focus-visible {
+      outline: 1px solid #4285f4;
+    }
+  /* CSS */
+.model-viewer-container {
+  width: 80%; /* or any specific size */
+  height: 800px; /* or any specific size */
+  margin: auto; /* Center the container */
+}
+
+model-viewer {
+  width: 100%;
+  height: 100%;
+}
+  
   </style>
+<script>
+
+
+async function updateModel() {
+  const modelViewer = document.getElementById("dimension-demo");
+  const glTF = await modelViewer.exportScene();
+  const glbFile = new File([glTF], "export.glb");
+    
+  const formData = new FormData();
+  formData.append('file', glbFile, 'model.glb');
+  try {
+    // Extract <post-id> from the current URL
+    const postId = window.location.pathname.split('/')[1];
+    // Construct the upload URL dynamically
+    const uploadUrl = `/${postId}/upload`;
+    const response = await fetch(uploadUrl, {
+      method: 'PUT', // PUT for updating the resource
+      body: formData,
+    });
+    if (!response.ok) throw new Error('Network response was not ok.');
+    const result = await response.json();
+
+    const newModelUrl = result.newModelUrl;
+    document.getElementById('dimension-demo').setAttribute('src', newModelUrl);
+
+    // Refresh the page after the model is updated successfully
+    window.location.reload();
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+document.getElementById('submitNewDimensions').addEventListener('click', function() {
+      const modelViewer = document.getElementById('dimension-demo');
+      const size = modelViewer.getDimensions();
+      let newScale = 1;
+      // Get the new dimensions from the input fields
+      // check if x is enetered
+      if (document.getElementById('newX').value !== '') {
+        newScale = document.getElementById('newX').value / (size.x * 100).toFixed(0); // Convert cm to meters
+        console.log(document.getElementById('newX').value);
+      }
+      else if (document.getElementById('newY').value !== '') {
+        newScale = document.getElementById('newY').value / (size.y * 100).toFixed(0); // Convert cm to meters
+      }
+      else if (document.getElementById('newZ').value !== '') {
+        newScale = document.getElementById('newZ').value / (size.z * 100).toFixed(0); // Convert cm to meters
+      }
+      else {
+        alert('Please enter a new dimension');
+        return;
+      }
+      console.log(newScale)
+
+      // Update the model scale
+      modelViewer.scale = `${newScale} ${newScale} ${newScale}`;
+      
+      // Update the model
+      updateModel();
+    });
+
+const modelViewer = document.querySelector('#dimension-demo');
+
+const checkbox = modelViewer.querySelector('#show-dimensions');
+
+const dimElements = [...modelViewer.querySelectorAll('button'), modelViewer.querySelector('#dimLines')];
+
+function setVisibility(visible) {
+  dimElements.forEach((element) => {
+    if (visible) {
+      element.classList.remove('hide');
+    } else {
+      element.classList.add('hide');
+    }
+  });
+}
+
+checkbox.addEventListener('change', () => {
+  setVisibility(checkbox.checked);
+});
+
+modelViewer.addEventListener('ar-status', (event) => {
+  setVisibility(checkbox.checked && event.detail.status !== 'session-started');
+});
+
+// update svg
+function drawLine(svgLine, dotHotspot1, dotHotspot2, dimensionHotspot) {
+  if (dotHotspot1 && dotHotspot2) {
+    svgLine.setAttribute('x1', dotHotspot1.canvasPosition.x);
+    svgLine.setAttribute('y1', dotHotspot1.canvasPosition.y);
+    svgLine.setAttribute('x2', dotHotspot2.canvasPosition.x);
+    svgLine.setAttribute('y2', dotHotspot2.canvasPosition.y);
+
+    // use provided optional hotspot to tie visibility of this svg line to
+    if (dimensionHotspot && !dimensionHotspot.facingCamera) {
+      svgLine.classList.add('hide');
+    }
+    else {
+      svgLine.classList.remove('hide');
+    }
+  }
+}
+
+const dimLines = modelViewer.querySelectorAll('line');
+
+const renderSVG = () => {
+  drawLine(dimLines[0], modelViewer.queryHotspot('hotspot-dot+X-Y+Z'), modelViewer.queryHotspot('hotspot-dot+X-Y-Z'), modelViewer.queryHotspot('hotspot-dim+X-Y'));
+  drawLine(dimLines[1], modelViewer.queryHotspot('hotspot-dot+X-Y-Z'), modelViewer.queryHotspot('hotspot-dot+X+Y-Z'), modelViewer.queryHotspot('hotspot-dim+X-Z'));
+  drawLine(dimLines[2], modelViewer.queryHotspot('hotspot-dot+X+Y-Z'), modelViewer.queryHotspot('hotspot-dot-X+Y-Z')); // always visible
+  drawLine(dimLines[3], modelViewer.queryHotspot('hotspot-dot-X+Y-Z'), modelViewer.queryHotspot('hotspot-dot-X-Y-Z'), modelViewer.queryHotspot('hotspot-dim-X-Z'));
+  drawLine(dimLines[4], modelViewer.queryHotspot('hotspot-dot-X-Y-Z'), modelViewer.queryHotspot('hotspot-dot-X-Y+Z'), modelViewer.queryHotspot('hotspot-dim-X-Y'));
+};
+
+modelViewer.addEventListener('load', () => {
+  const center = modelViewer.getBoundingBoxCenter();
+  const size = modelViewer.getDimensions();
+  const x2 = size.x / 2;
+  const y2 = size.y / 2;
+  const z2 = size.z / 2;
+
+  modelViewer.updateHotspot({
+    name: 'hotspot-dot+X-Y+Z',
+    position: `${center.x + x2} ${center.y - y2} ${center.z + z2}`
+  });
+
+  modelViewer.updateHotspot({
+    name: 'hotspot-dim+X-Y',
+    position: `${center.x + x2 * 1.2} ${center.y - y2 * 1.1} ${center.z}`
+  });
+  modelViewer.querySelector('button[slot="hotspot-dim+X-Y"]').textContent =
+      `${(size.z * 100).toFixed(0)} cm`;
+
+  modelViewer.updateHotspot({
+    name: 'hotspot-dot+X-Y-Z',
+    position: `${center.x + x2} ${center.y - y2} ${center.z - z2}`
+  });
+
+  modelViewer.updateHotspot({
+    name: 'hotspot-dim+X-Z',
+    position: `${center.x + x2 * 1.2} ${center.y} ${center.z - z2 * 1.2}`
+  });
+  modelViewer.querySelector('button[slot="hotspot-dim+X-Z"]').textContent =
+      `${(size.y * 100).toFixed(0)} cm`;
+
+  modelViewer.updateHotspot({
+    name: 'hotspot-dot+X+Y-Z',
+    position: `${center.x + x2} ${center.y + y2} ${center.z - z2}`
+  });
+
+  modelViewer.updateHotspot({
+    name: 'hotspot-dim+Y-Z',
+    position: `${center.x} ${center.y + y2 * 1.1} ${center.z - z2 * 1.1}`
+  });
+  modelViewer.querySelector('button[slot="hotspot-dim+Y-Z"]').textContent =
+      `${(size.x * 100).toFixed(0)} cm`;
+
+  modelViewer.updateHotspot({
+    name: 'hotspot-dot-X+Y-Z',
+    position: `${center.x - x2} ${center.y + y2} ${center.z - z2}`
+  });
+
+  modelViewer.updateHotspot({
+    name: 'hotspot-dim-X-Z',
+    position: `${center.x - x2 * 1.2} ${center.y} ${center.z - z2 * 1.2}`
+  });
+  modelViewer.querySelector('button[slot="hotspot-dim-X-Z"]').textContent =
+      `${(size.y * 100).toFixed(0)} cm`;
+
+  modelViewer.updateHotspot({
+    name: 'hotspot-dot-X-Y-Z',
+    position: `${center.x - x2} ${center.y - y2} ${center.z - z2}`
+  });
+
+  modelViewer.updateHotspot({
+    name: 'hotspot-dim-X-Y',
+    position: `${center.x - x2 * 1.2} ${center.y - y2 * 1.1} ${center.z}`
+  });
+  modelViewer.querySelector('button[slot="hotspot-dim-X-Y"]').textContent =
+      `${(size.z * 100).toFixed(0)} cm`;
+
+  modelViewer.updateHotspot({
+    name: 'hotspot-dot-X-Y+Z',
+    position: `${center.x - x2} ${center.y - y2} ${center.z + z2}`
+  });
+
+  renderSVG();
+
+  modelViewer.addEventListener('camera-change', renderSVG);
+});
+
+</script>
 </body>
 </html>

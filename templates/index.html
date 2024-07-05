@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html style="background: #D3CCE3;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to right, #E9E4F0, #D3CCE3);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to right, #E9E4F0, #D3CCE3); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */">
+<head>
+    <title>Atashinzh</title>
+</head>
+<body>
+  <h1 style="text-align: center;">All 3d Models</h1>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    {% for i in range(posts|length // 5 + (1 if posts|length % 5 else 0)) %}
+    <div class="model-viewer-container">
+        {% for post in posts[i*5:(i+1)*5] %}
+        <a href="/{{post.post_id}}/view" style="width: 20%; height: 100%; display: block;">
+            <model-viewer style="width: 100%; height: 100%; background: rgba(255, 255, 255, 0.1);" id="dimension-demo" ar ar-scale="auto" camera-orbit="-30deg auto auto" max-camera-orbit="auto 100deg auto" shadow-intensity="1" ar camera-controls touch-action="pan-y" src="{{ url_for('static', filename=post.post_id + '.glb') }}" tone-mapping="neutral" alt="{{ post.task_id }}"></model-viewer>
+        </a>
+        {% endfor %}
+    </div>
+    {% endfor %}
+  <style>
+  /* CSS */
+  .model-viewer-container {
+  display: flex; /* Enable flexbox layout */
+  justify-content: center; /* Center the items horizontally */
+  align-items: center; /* Center the items vertically */
+  width: 80%; /* or any specific size */
+  height: 200px; /* or any specific size */
+  margin: auto; /* Center the container */
+}
+
+model-viewer {
+  width: 50%; /* Adjusted width to fit two side-by-side */
+  height: 100%;
+}
+h1 {
+    text-align: center;
+    font-family: 'Arial', sans-serif; /* Use a more elegant font */
+    color: #5D3FD3; /* A color that matches the background gradient */
+    font-size: 48px; /* Larger font size */
+    text-shadow: 2px 2px 4px #D3CCE3; /* Soft shadow for depth */
+    margin-bottom: 20px; /* Space below the header */
+  }
+  </style>
+</body>
+</html>

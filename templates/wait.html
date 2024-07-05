@@ -15,5 +15,10 @@
   <p class="info">* Mouse or Finger press on the page to finish loading action.</p>
 <!-- partial -->
   <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r77/three.min.js'></script><script src="{{ url_for('static', filename='js/wait.js') }}"></script>
+  <script>
+    setTimeout(function() {
+      window.location.reload(true);
+    }, 5000); 
+  </script>
 </body>
 </html>

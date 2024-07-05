@@ -69,7 +69,23 @@
                 <label for="url">Or by URL:</label>
                 <input type="text" id="url" name="url" placeholder="Enter image URL" oninput="checkInputType()">
             </div>
-            <button type="submit">Upload</button>
+            <div>
+                <label for="new_x">New X:</label>
+                <input type="text" id="new_x" name="new_x" placeholder="Enter new X">
+            </div>
+            <div>
+                <label for="new_y">New Y:</label>
+                <input type="text" id="new_y" name="new_y" placeholder="Enter new Y">
+            </div>
+            <div>
+                <label for="new_z">New Z:</label>
+                <input type="text" id="new_z" name="new_z" placeholder="Enter new Z">
+            </div>
+
+            <!-- Hidden input field to store the JSON string -->
+            <input type="hidden" id="new_sizes" name="new_sizes">
+
+            <button type="submit" onclick="prepareData()">Upload</button>
         </form>
     </div>
     <script>
@@ -85,6 +101,27 @@
                 form.action = window.location.pathname;
             }
         }
+        function prepareData() {
+            const newX = document.getElementById('new_x').value;
+            const newY = document.getElementById('new_y').value;
+            const newZ = document.getElementById('new_z').value;
+
+            // Constructing the dictionary
+            const sizesDict = {
+                x: newX,
+                y: newY,
+                z: newZ
+            };
+
+            // Converting the dictionary to a JSON string
+            const sizesJson = JSON.stringify(sizesDict);
+
+            // Setting the JSON string as the value of the hidden input field
+            document.getElementById('new_sizes').value = sizesJson;
+
+            // No need to manually set form action here unless it's dynamic
+        }
+
     </script>
 </body>
 </html>
