@@ -1,7 +1,7 @@
 from db.models import db, Post
 
-def create_new_post(post_id, task_id):
-    new_post = Post(post_id=post_id, task_id=task_id)
+def create_new_post(post_id, task_id, new_sizes={}):
+    new_post = Post(post_id=post_id, task_id=task_id, new_sizes=new_sizes)
     db.session.add(new_post)
     db.session.commit()
 
@@ -19,3 +19,6 @@ def delete_post(post_id):
     if post:
         db.session.delete(post)
         db.session.commit()
+
+def get_all_posts():
+    return Post.query.all()
