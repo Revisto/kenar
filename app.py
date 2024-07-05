@@ -1,6 +1,6 @@
 from flask import Flask
 from db.models import db
-from routes import main
+from routers import main
 
 app = Flask(__name__)
 app.register_blueprint(main)
