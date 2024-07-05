@@ -30,7 +30,7 @@ def view(post_id):
                 with open(model_file, 'wb') as file:
                     response = requests.get(model_file_url)
                     file.write(response.content)
-                resize_model(model_file, model_file, post.new_sizes)
+                #resize_model(model_file, model_file, post.new_sizes)
                 post_operations.update_post_status(post_id, 'SUCCEEDED')
             elif task['status'] == 'FAILED' or task['status'] == 'EXPIRED':
                 flash('Model creation failed')
@@ -90,14 +90,14 @@ def upload_post(post_id):
                 post_operations.delete_post(post_id)
             post_operations.create_new_post(post_id, task_id, new_sizes)
             flash('File successfully uploaded')
-            view_url = url_for('main.view', post_id=post_id)
+            view_url = url_for('main.view', post_id=post_id, admin=True)
             return render_template('success.html', view_url=view_url)
     elif 'url' in request.form and request.form['url'] != '':
         image_url = request.form['url']
         task_id = MeshyService(Config.MESHY_API_KEY).create_image_to_3d_task(image_url)
         post_operations.create_new_post(post_id, task_id)
         flash('URL received')
-        view_url = url_for('main.view', post_id=post_id)
+        view_url = url_for('main.view', post_id=post_id, admin=True)
         return render_template('success.html', view_url=view_url)
     else:
         flash('No file or URL provided')
@@ -145,8 +145,3 @@ def index():
 
     posts = post_operations.get_all_posts()
     return render_template('index.html', posts=posts)
-
-
-@main.route('/test')
-def test():
-    return render_template('wait.html')
