@@ -6,7 +6,7 @@
 <body>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
   <div class="model-viewer-container">
-    <model-viewer style="width: 100%; height: 100%;" id="dimension-demo" ar ar-scale="auto" camera-orbit="-30deg auto auto" max-camera-orbit="auto 100deg auto" shadow-intensity="1" ar camera-controls touch-action="pan-y" src="{{ model_file }}" tone-mapping="neutral" alt="A 3D model of an armchair.">
+    <model-viewer style="width: 100%; height: 100%;" id="dimension-demo" ar ar-scale="fixed" camera-orbit="-30deg auto auto" max-camera-orbit="auto 100deg auto" shadow-intensity="1" ar camera-controls touch-action="pan-y" src="{{ model_file }}" tone-mapping="neutral" alt="A 3D model of an armchair.">
     <button slot="ar-button" id="ar-button">
       View in your space
   </button>
