@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, url_for, flash, render_template
+from flask import Blueprint, request, redirect, url_for, flash, render_template, jsonify
 from werkzeug.utils import secure_filename
 import os
 import requests
@@ -6,6 +6,7 @@ import requests
 from db import post_operations
 from services.meshy_service import MeshyService
 from services.image_uploader_service import ImageUploader
+from services.resizer import resize_model
 from config import Config
 
 main = Blueprint('main', __name__)
@@ -29,6 +30,7 @@ def view(post_id):
                 with open(model_file, 'wb') as file:
                     response = requests.get(model_file_url)
                     file.write(response.content)
+                resize_model(model_file, model_file, post.new_sizes)
                 post_operations.update_post_status(post_id, 'SUCCEEDED')
             elif task['status'] == 'FAILED' or task['status'] == 'EXPIRED':
                 flash('Model creation failed')
@@ -45,7 +47,12 @@ def view(post_id):
         return render_template('404.html', error='Post not found')
     
     model_file = url_for('static', filename=f"{post_id}.glb")
-    return render_template('view.html', model_file=model_file)
+    user_is_admin = request.args.get('admin')
+    if user_is_admin:
+        user_is_admin = True
+    else:
+        user_is_admin = False
+    return render_template('view.html', model_file=model_file, user_is_admin=user_is_admin)
 
 @main.route('/<post_id>/upload', methods=['GET'])
 def upload(post_id):
@@ -78,7 +85,8 @@ def upload_post(post_id):
             file.save(os.path.join("./", filename))
             task_id = MeshyService(Config.MESHY_API_KEY).create_image_to_3d_task(ImageUploader(Config.IMAGE_UPLOAD_URL).upload_image_from_file(filename))
             os.remove(filename)
-            post_operations.create_new_post(post_id, task_id)
+            new_sizes = request.form.get('new_sizes')
+            post_operations.create_new_post(post_id, task_id, new_sizes)
             flash('File successfully uploaded')
             view_url = url_for('main.view', post_id=post_id)
             return render_template('success.html', view_url=view_url)
@@ -92,15 +100,46 @@ def upload_post(post_id):
     else:
         flash('No file or URL provided')
         return redirect(request.url)
-    
+
+@main.route('/<post_id>/upload', methods=['PUT'])
+def update_glb(post_id):
+    post = post_operations.get_post_by_id(post_id)
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+    if file:
+        if post:
+            filename = secure_filename(file.filename)
+            if filename.split('.')[-1].lower() != 'glb':
+                flash('Invalid file format, only GLB files are allowed.')
+                return redirect(request.url)
+            
+            file_path = os.path.join("static", f"{post_id}.glb")
+            file.save(file_path)
+            flash('GLB file successfully uploaded and new post created.')
+            newModelUrl = url_for('static', filename=f"{post_id}.glb", _external=True)
+            return jsonify({'message': 'File successfully uploaded/updated', 'newModelUrl': newModelUrl}), 200
+        else:
+            flash('Post not found')
+            return jsonify({'error': 'Post not found.'}), 404
+    else:
+        return jsonify({'error': 'Failed to upload the file.'}), 400 
+
 @main.route('/upload', methods=['GET'])
 def upload_redirect():
     post_id = request.args.get('post_token')
     return redirect(url_for('main.upload', post_id=post_id))
 
 @main.route('/')
-def redirect_to_view():
+def index():
     action = request.args.get('action')
     if action == 'view':
         post_id = request.args.get('post_token')
         return redirect(url_for('main.view', post_id=post_id))
+
+    posts = post_operations.get_all_posts()
+    return render_template('index.html', posts=posts)
