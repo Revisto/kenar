@@ -86,6 +86,8 @@ def upload_post(post_id):
             task_id = MeshyService(Config.MESHY_API_KEY).create_image_to_3d_task(ImageUploader(Config.IMAGE_UPLOAD_URL).upload_image_from_file(filename))
             os.remove(filename)
             new_sizes = request.form.get('new_sizes')
+            if post_operations.get_post_by_id(post_id):
+                post_operations.delete_post(post_id)
             post_operations.create_new_post(post_id, task_id, new_sizes)
             flash('File successfully uploaded')
             view_url = url_for('main.view', post_id=post_id)
