@@ -57,19 +57,19 @@ def view(post_id):
 @main.route('/<post_id>/upload', methods=['GET'])
 def upload(post_id):
     # check if the post exists in the database
-    post = post_operations.get_post_by_id(post_id)
-    if post:
-        flash('Post already exists')
-        return render_template('success.html', view_url=url_for('main.view', post_id=post_id))
+    #post = post_operations.get_post_by_id(post_id)
+    #if post:
+    #    flash('Post already exists')
+    #    return render_template('success.html', view_url=url_for('main.view', post_id=post_id))
     return render_template('upload.html')
 
 @main.route('/<post_id>/upload', methods=['POST'])
 def upload_post(post_id):
     # check if the post exists in the database
-    post = post_operations.get_post_by_id(post_id)
-    if post:
-        flash('Post already exists')
-        return render_template('success.html', view_url=url_for('main.view', post_id=post_id))
+    #post = post_operations.get_post_by_id(post_id)
+    #if post:
+    #    flash('Post already exists')
+    #    return render_template('success.html', view_url=url_for('main.view', post_id=post_id))
     
     if 'file' in request.files and request.files['file'].filename != '':
         file = request.files['file']
@@ -143,3 +143,8 @@ def index():
 
     posts = post_operations.get_all_posts()
     return render_template('index.html', posts=posts)
+
+
+@main.route('/test')
+def test():
+    return render_template('wait.html')
