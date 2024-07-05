@@ -3,7 +3,7 @@
 
 Welcome to the Kenar Divar AR Furniture Viewer! This innovative project was developed for the Kenar Divar Hackathon competition, aiming to revolutionize the way we interact with furniture listings online. By converting pictures of furniture from listings into 3D models (in GLB format) using AI, users can visualize these items in their actual size and place them in their homes using augmented reality (AR). This project leverages the power of AR to enhance the online shopping experience, making it more interactive and immersive.
 
-![Kenar Divar](https://iranianstartup.com/wp-content/uploads/2024/01/%DA%A9%D9%86%D8%A7%D8%B1-1.png)
+![Kenar demo](https://raw.githubusercontent.com/Revisto/kenar/master/demo.jpg)
 
 ## Features 🌟
 
@@ -12,6 +12,8 @@ Welcome to the Kenar Divar AR Furniture Viewer! This innovative project was deve
 - **Easy Upload**: Users can upload images or provide URLs for the furniture they wish to visualize.
 - **Progress Tracking**: Monitor the status of the 3D model conversion process (pending, processing, completed).
 - **Admin Mode**: Special access for admins to change scale of models to their exact needs.
+
+![Kenar Divar](https://iranianstartup.com/wp-content/uploads/2024/01/%DA%A9%D9%86%D8%A7%D8%B1-1.png)
 
 ## Getting Started 🚀
 
